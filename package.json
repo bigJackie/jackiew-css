@@ -11,6 +11,7 @@
     "cz": "pnpm run log && git add . && git cz"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue": "^4.0.0",
     "commitizen": "^4.3.0",
     "commitlint": "^17.4.3",
     "conventional-changelog-cli": "^2.2.2",
@@ -31,5 +32,8 @@
     "commitizen": {
       "path": "./node_modules/vue-cli-plugin-commitlint/lib/cz"
     }
+  },
+  "dependencies": {
+    "vue": "^3.2.25"
   }
 }
