@@ -1,14 +1,22 @@
 {
-  "name": "jackiew-css",
+  "name": "@jackiew/atomcss",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "author": "JackieWong",
+  "license": "MIT",
+  "main":"jackiew-css.es.js",
   "scripts": {
     "dev": "pnpm -r --parallel --filter=./packages/* run dev",
-    "build": "cp README.md packages/jackiew-css && pnpm -r --filter=./packages/* run build",
+    "build": "vite build && copy package.json dist",
     "preview": "vite preview",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
     "log": "conventional-changelog --config ./node_modules/vue-cli-plugin-commitlint/lib/log -i CHANGELOG.md -s -r 0",
     "cz": "pnpm run log && git add . && git cz"
+  },
+  "dependencies": {
+    "vue": "^3.2.25"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
@@ -19,7 +27,6 @@
     "right-pad": "^1.0.1",
     "typescript": "^4.9.3",
     "vite": "^4.1.0",
-    "vite-plugin-inspect": "^0.7.15",
     "vitest": "^0.28.5",
     "vue-cli-plugin-commitlint": "^1.0.12"
   },
@@ -32,8 +39,5 @@
     "commitizen": {
       "path": "./node_modules/vue-cli-plugin-commitlint/lib/cz"
     }
-  },
-  "dependencies": {
-    "vue": "^3.2.25"
   }
 }

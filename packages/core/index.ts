@@ -1,38 +1,50 @@
-import type { PluginOption } from "vite";
-import preset from "./preset";
-const rules = preset.rules;
+import { rules } from "../presets/default/_rule";
+import { RuleHandler } from "../utils/type";
 
-export default function loadClass() {
-  const vueRE = /\.vue$/;
-  const classRE = /(?<=class=")(.*)(?=")/g;
+const classMap = new Map();
 
-  return <PluginOption>{
-    name: "class-loader",
-
-    enforce: "pre",
-
-    transform(code, id, opt) {
-      // 匹配vue文件 非vue文件return
-      if (!vueRE.test(id)) return code;
-      let style = "";
-
-      // 匹配class
-      let class_inline = code.match(classRE);
-      for (let i in class_inline) {
-        rules.forEach(rule => {
-          const class_name_reg = rule[0] as RegExp;
-          const class_style_reg = rule[1] as RegExp;
-          const f = rule[2] as Function;
-          const class_name = class_inline[i].match(class_name_reg);
-          const class_style = class_inline[i].match(class_style_reg);
-
-          if (!!class_name) {
-            style += `.${class_name[0]}\{${f(class_style).key}:${f(class_style).val};\}`;
-          }
-        });
+export function generateStyle(classLine: string) {
+  let style = "";
+  rules.forEach(rule => {
+    if (typeof rule[1] == "function") {
+      let res = (<RegExp>rule[0]).exec(classLine);
+      while (res) {
+        const [className, , ,] = res;
+        if (hasClass(className)) {
+          style += classMap.get(className);
+        } else {
+          const merge = mergeStyle(className, rule[1](res));
+          style += merge;
+          classMap.set(className, merge);
+        }
+        res = (<RegExp>rule[0]).exec(classLine);
       }
+    }
+  });
+  return style;
+}
 
-      return `<style>${style}</style>${code}`;
-    },
-  };
+export function getStyle(classLine: string) {
+  let style = "";
+  rules.forEach(rule => {
+    if (typeof rule[1] == "function") {
+      let res = (<RegExp>rule[0]).exec(classLine);
+      while (res) {
+        const [className, , ,] = res;
+        style += mergeStyle(className, rule[1](res));
+        res = (<RegExp>rule[0]).exec(classLine);
+      }
+    }
+  });
+  return style;
+}
+
+function mergeStyle(className: string, attrs: RuleHandler) {
+  let line = "";
+  attrs.forEach(attr => (line += `${attr.join(":")};`));
+  return `.${className}\{${line}\}`;
+}
+
+function hasClass(className: string) {
+  return classMap.has(className) ? true : false;
 }
