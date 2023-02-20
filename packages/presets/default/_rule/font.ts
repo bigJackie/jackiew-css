@@ -1,18 +1,20 @@
 import { Rule } from "../../../utils/type";
-import { RuleHandler } from "../../../utils/type";
 
 export const font: Rule[] = [
   // font-size
-  [/\b(?:text|t)-(\d+)/g, ([, val]) => [["font-size", `${val}px`]]],
+  [/^(?:text|t)-(\d+)$/, ([, val]) => [["font-size", `${parseInt(val)}px`]]],
   // font-style
   // [/(text|t)-(\d+)/g, fontSizeHandler],
   // font-weight
   // leeter-spacing
-  [/\b(?:text|t|letter)-(?:spacing)-(\d+)/g, ([, val]) => [["letter-spacing", `${val}px`]]],
+  [/^(?:text|t|letter)-(?:spacing)-(\d+)$/, ([, val]) => [["letter-spacing", `${parseInt(val)}px`]]],
   // line-height
-  [/\b(?:text|t|line)-(?:height|h)-(\d+)(x?)/g, ([, val, mul]) => [["line-height", `${mul ? val : val + "px"}`]]],
+  [
+    /^(?:text|t|line)-(?:height|h)-(\d+)(x?)$/,
+    ([, val, mul]) => [["line-height", `${mul ? parseInt(val) : parseInt(val) + "px"}`]],
+  ],
   // text-align
-  [/\b(?:text|t)-(left|right|center|justify)/g, ([, val]) => [["text-align", val]]],
+  [/^(?:text|t)-(left|right|center|justify)$/, ([, val]) => [["text-align", val]]],
   // text-color
   // [/(?:text|t)/g,()=>[[]]]
   // text-decoration

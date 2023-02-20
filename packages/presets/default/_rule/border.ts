@@ -4,9 +4,9 @@ import { directionMap } from "../_theme/mapping";
 
 export const border: Rule[] = [
   // border-width
-  [/(border|b)(?:-?)([^\s-]*)-(\d+)/g, borderWidthHandler],
+  // [/(border|b)(?:-?)([^\s-]*)-(\d+)/g, borderWidthHandler],
   // border-radius
-  [/(rounded)(?:-?)([^\s-]*)-([A-z0-9]+)/g, borderRadiusHandler],
+  // [/(rounded)(?:-?)([^\s-]*)-([A-z0-9]+)/g, borderRadiusHandler],
 ];
 
 function borderWidthHandler([, , mod, val]: string[]): RuleHandler {
