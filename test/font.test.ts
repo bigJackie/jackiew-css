@@ -1,9 +1,30 @@
 import { describe, expect, it } from "vitest";
 import { getStyle } from "../packages/core";
 
-describe("font style", () => {
-  const style = "text-20 t-0";
+describe.concurrent("font style", () => {
   it("font-size", () => {
-    expect(getStyle(style)).toEqual(".text-20{font-size:20px;}.t-0{font-size:0px;}");
+    const style = "text-0 t-20";
+    expect(getStyle(style)).toEqual(".text-0{font-size:0px;}.t-20{font-size:20px;}");
+  });
+
+  it("letter-spacing", () => {
+    const style = "text-spacing-0 t-spacing-20 letter-spacing-200";
+    expect(getStyle(style)).toEqual(
+      ".text-spacing-0{letter-spacing:0px;}.t-spacing-20{letter-spacing:20px;}.letter-spacing-200{letter-spacing:200px;}"
+    );
+  });
+
+  it("line-height", () => {
+    const style = "text-height-0 t-height-20 line-h-200 t-h-3x";
+    expect(getStyle(style)).toEqual(
+      ".text-height-0{line-height:0px;}.t-height-20{line-height:20px;}.line-h-200{line-height:200px;}.t-h-3x{line-height:3;}"
+    );
+  });
+
+  it("text-align", () => {
+    const style = "text-left text-right t-center t-justify";
+    expect(getStyle(style)).toEqual(
+      ".text-left{text-align:left;}.text-right{text-align:right;}.t-center{text-align:center;}.t-justify{text-align:justify;}"
+    );
   });
 });
