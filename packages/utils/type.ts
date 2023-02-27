@@ -1,5 +1,6 @@
 export interface StylePreset {
-  rules: Array<Array<RegExp | Function>>;
+  rules?: Rule[];
+  variants?: Variant[];
 }
 
 export interface Variant {
@@ -8,10 +9,9 @@ export interface Variant {
   rewrite?: ReWrite;
 }
 
-export type CSSObject = Record<string, string | number | undefined>;
 export type RuleHandler = [string, string | number | undefined][];
 export type DynamicRule = [RegExp, Function];
-export type StaticRule = [string, CSSObject];
+export type StaticRule = [string | RegExp, RuleHandler];
 export type Rule = DynamicRule | StaticRule;
 
 export type Match = (s: string) => string;

@@ -1,79 +1,119 @@
 import { rules, variants } from "../presets/default/_rule";
-import { RuleHandler, Selector, ReWrite } from "../utils/type";
+import { RuleHandler, Selector, ReWrite, StylePreset, Rule, Variant } from "../utils/type";
 
-const classMap = new Map();
+const classMap: Map<string, string> = new Map();
+
+/* customize preset */
+export function customize(presets: StylePreset) {
+  presets.rules ? rules.push.apply(rules, presets.rules) : null;
+  presets.variants ? variants.push.apply(variants, presets.variants) : null;
+}
 
 export function generateStyle(classLine: string) {
-  let style = "";
-  rules.forEach(rule => {
-    if (typeof rule[1] == "function") {
-      let res = classLine.split(" ");
-      for (let i of res) {
-        const className = i;
-        let ruleName = className,
-          ruleSelectors: Selector[] = [],
-          ruleRewrites: ReWrite[] = [];
-        for (let j = 0; j < variants.length; j++) {
-          const variant = variants[j];
-          if (variant.match(ruleName)) {
-            ruleName = variant.match(ruleName);
-            if (variant.selector) ruleSelectors.push(variant.selector);
-            if (variant.rewrite) ruleRewrites.push(variant.rewrite);
-          }
-        }
-        if (!(<RegExp>rule[0]).test(ruleName)) continue;
-        if (hasClass(className)) {
-          style += classMap.get(className);
-        } else {
-          const merge = mergeStyle(className, rule[1]((<RegExp>rule[0]).exec(ruleName)), ruleSelectors, ruleRewrites);
-          style += merge;
-          classMap.set(className, merge);
-        }
+  const classItems: string[] = classLine.split(" ");
+  let style: string = "";
+
+  for (let ruleIndex = rules.length - 1; ruleIndex >= 0; ruleIndex--) {
+    const rule: Rule = rules[ruleIndex];
+
+    for (let classItem of classItems) {
+      const className = classItem;
+      let ruleName: string = className,
+        ruleSelectors: Selector[] = [],
+        ruleRewrites: ReWrite[] = [];
+
+      for (let variantIndex = 0; variantIndex < variants.length; variantIndex++) {
+        const variant: Variant = variants[variantIndex];
+        if (!variant.match(ruleName)) continue;
+
+        ruleName = variant.match(ruleName);
+        if (variant.selector) ruleSelectors.push(variant.selector);
+        if (variant.rewrite) ruleRewrites.push(variant.rewrite);
+      }
+
+      if (!(<RegExp>rule[0]).test(ruleName)) continue;
+
+      if (hasClass(className)) {
+        style += classMap.get(className);
+      } else {
+        const attrs = typeof rule[1] === "function" ? rule[1]((<RegExp>rule[0]).exec(ruleName)) : rule[1];
+        const merge = mergeStyle(className, attrs, ruleSelectors, ruleRewrites);
+        style += merge;
+        classMap.set(className, merge);
       }
     }
-  });
+  }
+
   return style;
 }
 
 export function getStyle(classLine: string) {
-  let style = "";
-  rules.forEach(rule => {
-    if (typeof rule[1] == "function") {
-      let res = classLine.split(" ");
-      for (let i of res) {
-        const className = i;
-        let ruleName = className,
-          ruleSelectors: Selector[] = [],
-          ruleRewrites: ReWrite[] = [];
-        for (let j = 0; j < variants.length; j++) {
-          const variant = variants[j];
-          if (variant.match(ruleName)) {
-            ruleName = variant.match(ruleName);
-            if (variant.selector) ruleSelectors.push(variant.selector);
-            if (variant.rewrite) ruleRewrites.push(variant.rewrite);
-          }
-        }
-        if (!(<RegExp>rule[0]).test(ruleName)) continue;
-        style += mergeStyle(className, rule[1]((<RegExp>rule[0]).exec(ruleName)), ruleSelectors, ruleRewrites);
+  // check group
+  classLine = groupHandler(classLine);
+
+  const classItems: string[] = classLine.split(" ");
+  let style: string = "";
+
+  for (let ruleIndex = rules.length - 1; ruleIndex >= 0; ruleIndex--) {
+    const rule: Rule = rules[ruleIndex];
+
+    for (let classItem of classItems) {
+      const className = classItem;
+      let ruleName: string = className,
+        ruleSelectors: Selector[] = [],
+        ruleRewrites: ReWrite[] = [];
+
+      for (let variantIndex = 0; variantIndex < variants.length; variantIndex++) {
+        const variant: Variant = variants[variantIndex];
+        if (!variant.match(ruleName)) continue;
+
+        ruleName = variant.match(ruleName);
+        if (variant.selector) ruleSelectors.push(variant.selector);
+        if (variant.rewrite) ruleRewrites.push(variant.rewrite);
       }
+      if (!(<RegExp>rule[0]).test(ruleName)) continue;
+
+      const attrs = typeof rule[1] === "function" ? rule[1]((<RegExp>rule[0]).exec(ruleName)) : rule[1];
+      const merge = mergeStyle(className, attrs, ruleSelectors, ruleRewrites);
+      style += merge;
     }
-  });
+  }
   return style;
 }
 
 function mergeStyle(className: string, attrs: RuleHandler, selectors: Selector[], rewrites: ReWrite[]) {
-  let line = "";
+  let line: string = "";
   selectors.forEach(selector => (className = selector(className)));
   attrs.forEach(attr => {
     line = `${attr.join(":")}`;
     rewrites.forEach(rewrite => (line = rewrite(line)));
     line += ";";
   });
+
   return `.${className}\{${line}\}`;
 }
 
-// console.log(getStyle("!hover:t-30"));
-
 function hasClass(className: string) {
   return classMap.has(className) ? true : false;
+}
+
+export function groupHandler(line: string) {
+  const groupRE: RegExp = /([\S]*?:)(?:\()([\s\S]*?)(?:\))/g;
+
+  // no group in class, return
+  if (!groupRE.test(line)) return line;
+
+  const groups: RegExpMatchArray = line.match(groupRE);
+  groups.forEach(group => {
+    let [selector, classNames] = group.split(":"),
+      newLine: Array<string> = [];
+
+    // remove parentheses
+    classNames = classNames.substring(1, classNames.length - 1);
+    classNames.split(" ").forEach(className => {
+      newLine.push(`${selector}:${className}`);
+    });
+    line = line.replace(group, newLine.join(" "));
+  });
+  return line;
 }

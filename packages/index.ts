@@ -1,21 +1,23 @@
-import type { PluginOption } from "vite";
-import { generateStyle } from "./core";
+import type { ModuleNode, PluginOption, ViteDevServer } from "vite";
+import { customize, generateStyle, groupHandler } from "./core";
+import { StylePreset } from "./utils/type";
 
-export default function loadClass() {
-  const vueRE = /\.vue$/;
-  const cssRE = /\.css$/;
-  const classRE = /(?<=class=")(.*)(?=")/g;
-  const styleRE = /<(style)[\s\S]*?>[\s\S]+?<\/\1>/g;
-  let viteServer = null,
-    cssModules = null;
+export default function loadClass(presets: StylePreset = null) {
+  if (presets) customize(presets);
+
+  const vueRE: RegExp = /\.vue$/,
+    cssRE: RegExp = /\.css$/,
+    classRE: RegExp = /(?<=class=")(.*)(?=")/g,
+    styleRE: RegExp = /<(style)[\s\S]*?>[\s\S]+?<\/\1>/g;
+  let viteServer: ViteDevServer = null,
+    cssModules: ModuleNode[] = null;
 
   return <PluginOption>{
     name: "class-loader",
-
     enforce: "pre",
 
     handleHotUpdate(ctx) {
-      let updateModules;
+      let updateModules: ModuleNode[];
       const { file, server, modules } = ctx;
       if (!viteServer) viteServer = server;
 
@@ -29,38 +31,45 @@ export default function loadClass() {
     },
 
     transform(code, id, opt) {
-      // 匹配vue文件 非vue文件return
+      // Match .vue files
       if (!vueRE.test(id)) return code;
-      let cssFileNum = 0,
-        style = "";
-      // 匹配class
+
+      let cssFileNum: number = 0,
+        style: string = "";
+
+      // Match inline class
       if (classRE.test(code)) {
         cssFileNum++;
         let class_inline = code.match(classRE);
         for (let line of class_inline) {
-          style += generateStyle(line);
+          const newLine = groupHandler(line);
+          code = code.replace(line, newLine);
+          style += generateStyle(newLine);
         }
       }
       if (styleRE.test(code)) cssFileNum += code.match(styleRE).length;
 
-      if (cssModules) {
-        cssModules.forEach(module => {
-          if (cssFileNum > 0) {
-            viteServer.ws.send({
-              type: "update",
-              updates: [
-                {
-                  type: "js-update",
-                  path: module.url,
-                  acceptedPath: module.url,
-                  timestamp: new Date().getTime(),
-                },
-              ],
-            });
-          }
-          cssFileNum--;
+      if (!cssModules) return `<style>${style}</style>${code}`;
+
+      // check if changed .vue file's inline class, update virtual css file
+      for (let index = 0; index < cssModules.length; index++) {
+        if (cssFileNum <= 0) continue;
+
+        const module = cssModules[index];
+        viteServer.ws.send({
+          type: "update",
+          updates: [
+            {
+              type: "js-update",
+              path: module.url,
+              acceptedPath: module.url,
+              timestamp: new Date().getTime(),
+            },
+          ],
         });
+        cssFileNum--;
       }
+
       return `<style>${style}</style>${code}`;
     },
   };

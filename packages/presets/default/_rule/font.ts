@@ -4,7 +4,6 @@ export const font: Rule[] = [
   // font-size
   [/^(?:text|t)-(\d+)$/, ([, val]) => [["font-size", `${parseInt(val)}px`]]],
   // font-style
-  // [/(text|t)-(\d+)/g, fontSizeHandler],
   // font-weight
   // leeter-spacing
   [/^(?:text|t|letter)-(?:spacing)-(\d+)$/, ([, val]) => [["letter-spacing", `${parseInt(val)}px`]]],
