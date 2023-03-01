@@ -21,6 +21,8 @@ atom css engine inspired by [antfu](https://antfu.me/)
 - 🧩 On-demand CSS utilities
 - 🔥 Hot module replacement (HMR)
 - 🎳 Support Variant Groups - e.g. `bg-gray-200 hover:(bg-gray-100 text-red-300)`
+- 🌑 Support Dark mode
+- 📱 Support Screen BreackPoints
 
 ## Documentation
 
@@ -42,6 +44,23 @@ export default defineConfig({
     AtomCss({}),
   ],
 });
+```
+
+## Custom Rules
+### css rules
+```javascript
+...
+plugins: [
+    AtomCss({
+      rules: [
+        [/^text-big$/, [["font-size", "48px"]]],
+        // ignore first parameter
+        [/^(?:width|w)-(\d+)%$/, ([, val])=>[["width", `${val}%`]]],
+      ],
+      // etc..
+    }),
+  ],
+...
 ```
 
 ## Browser Support
