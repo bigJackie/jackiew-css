@@ -5,15 +5,15 @@
   "type": "module",
   "author": "JackieWong",
   "license": "MIT",
-  "main":"jackiew-css.es.js",
+  "main": "jackiew-css.es.js",
   "scripts": {
-    "dev": "pnpm -r --parallel --filter=./packages/* run dev",
+    "dev": "npm -r --parallel --filter=./packages/* run dev",
     "build": "vite build && copy package.json dist",
     "preview": "vite preview",
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "log": "conventional-changelog --config ./node_modules/vue-cli-plugin-commitlint/lib/log -i CHANGELOG.md -s -r 0",
-    "cz": "pnpm run log && git add . && git cz"
+    "cz": "npm run log && git add . && git cz"
   },
   "dependencies": {
     "vue": "^3.2.25"

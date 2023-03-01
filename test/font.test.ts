@@ -27,4 +27,16 @@ describe.concurrent("font style", () => {
       ".text-left{text-align:left;}.text-right{text-align:right;}.t-center{text-align:center;}.t-justify{text-align:justify;}"
     );
   });
+
+  it("text-color", () => {
+    const style = "text-red text-current text-rose-200";
+    expect(getStyle(style)).toEqual(
+      ".text-red{color:#ef4444;}.text-rose-200{color:#fecdd3;}.text-current{color:currentColor;}"
+    );
+  });
+
+  it("background-color", () => {
+    const style = "rose-200";
+    expect(getStyle(style)).toEqual(".rose-200{background-color:#fecdd3;}");
+  });
 });

@@ -1,5 +1,5 @@
 import { rules, variants } from "../presets/default/_rule";
-import { RuleHandler, Selector, ReWrite, StylePreset, Rule, Variant } from "../utils/type";
+import { RuleHandler, Selector, ReWrite, Wrapper, StylePreset, Rule, Variant } from "../utils/type";
 
 const classMap: Map<string, string> = new Map();
 
@@ -20,7 +20,8 @@ export function generateStyle(classLine: string) {
       const className = classItem;
       let ruleName: string = className,
         ruleSelectors: Selector[] = [],
-        ruleRewrites: ReWrite[] = [];
+        ruleRewrites: ReWrite[] = [],
+        ruleWrapper: Wrapper = null;
 
       for (let variantIndex = 0; variantIndex < variants.length; variantIndex++) {
         const variant: Variant = variants[variantIndex];
@@ -29,6 +30,7 @@ export function generateStyle(classLine: string) {
         ruleName = variant.match(ruleName);
         if (variant.selector) ruleSelectors.push(variant.selector);
         if (variant.rewrite) ruleRewrites.push(variant.rewrite);
+        if (variant.wrapper) ruleWrapper = variant.wrapper;
       }
 
       if (!(<RegExp>rule[0]).test(ruleName)) continue;
@@ -37,13 +39,12 @@ export function generateStyle(classLine: string) {
         style += classMap.get(className);
       } else {
         const attrs = typeof rule[1] === "function" ? rule[1]((<RegExp>rule[0]).exec(ruleName)) : rule[1];
-        const merge = mergeStyle(className, attrs, ruleSelectors, ruleRewrites);
+        const merge = mergeStyle(className, attrs, ruleSelectors, ruleRewrites, ruleWrapper);
         style += merge;
         classMap.set(className, merge);
       }
     }
   }
-
   return style;
 }
 
@@ -61,7 +62,8 @@ export function getStyle(classLine: string) {
       const className = classItem;
       let ruleName: string = className,
         ruleSelectors: Selector[] = [],
-        ruleRewrites: ReWrite[] = [];
+        ruleRewrites: ReWrite[] = [],
+        ruleWrapper: Wrapper = null;
 
       for (let variantIndex = 0; variantIndex < variants.length; variantIndex++) {
         const variant: Variant = variants[variantIndex];
@@ -70,27 +72,34 @@ export function getStyle(classLine: string) {
         ruleName = variant.match(ruleName);
         if (variant.selector) ruleSelectors.push(variant.selector);
         if (variant.rewrite) ruleRewrites.push(variant.rewrite);
+        if (variant.wrapper) ruleWrapper = variant.wrapper;
       }
       if (!(<RegExp>rule[0]).test(ruleName)) continue;
 
       const attrs = typeof rule[1] === "function" ? rule[1]((<RegExp>rule[0]).exec(ruleName)) : rule[1];
-      const merge = mergeStyle(className, attrs, ruleSelectors, ruleRewrites);
+      const merge = mergeStyle(className, attrs, ruleSelectors, ruleRewrites, ruleWrapper);
       style += merge;
     }
   }
   return style;
 }
 
-function mergeStyle(className: string, attrs: RuleHandler, selectors: Selector[], rewrites: ReWrite[]) {
+function mergeStyle(
+  className: string,
+  attrs: RuleHandler,
+  selectors: Selector[],
+  rewrites: ReWrite[],
+  wrapper: Wrapper
+) {
   let line: string = "";
   selectors.forEach(selector => (className = selector(className)));
+
   attrs.forEach(attr => {
-    line = `${attr.join(":")}`;
+    line += `${attr.join(":")}`;
     rewrites.forEach(rewrite => (line = rewrite(line)));
     line += ";";
   });
-
-  return `.${className}\{${line}\}`;
+  return !!wrapper ? wrapper(`.${className}\{${line}\}`) : `.${className}\{${line}\}`;
 }
 
 function hasClass(className: string) {

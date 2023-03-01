@@ -1,13 +1,18 @@
 import { defineConfig } from "vite";
 import path from "path";
-import atomCss from "./packages/index";
+import { AtomCss } from "./packages/index";
 import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
   server: {
     port: 8888,
   },
-  plugins: [vue(), atomCss()],
+  plugins: [
+    vue(),
+    AtomCss({
+      // rules: [[/^(?:m)([t|r|b|l|x|y|a])-(\d+)(x?)$/, [["color", "red"]]]],
+    }),
+  ],
   build: {
     lib: {
       entry: path.resolve(__dirname, "packages/index.ts"),

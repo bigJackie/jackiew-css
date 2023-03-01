@@ -220,7 +220,6 @@ export const colors: Record<string, string | object> = {
     800: "#1f2937",
     900: "#111827",
   },
-
   slate: {
     50: "#f8fafc",
     100: "#f1f5f9",

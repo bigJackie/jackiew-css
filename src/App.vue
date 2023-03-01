@@ -3,10 +3,15 @@ import aa from "./aa.vue";
 </script>
 <template>
   <aa></aa>
-  <div class="ml-12 mr-1 mt-3 cursor-pointer border-l-3 line-h-300">
-    <span class="text-red t-100 t-spacing-10 line-h-20">nicle</span>
+  <div class="ml-12 mr-1 mt-3 cursor-pointer border-l-3 line-h-300 items-center">
+    <span class="text-red rose flex items-center">nicle</span>
+    <span class="rose mr-200" style="">nicle</span>
+    <span>nicle</span>
   </div>
-  <div class="ml-12 mr-1 mt-3 cursor-pointer border-l-3 line-h-3x">
-    <span class="t-200 text-red t-spacing-20">nicle</span>
-  </div>
+  <j-app>
+    <j-app-bar>
+      <j-app-bar-nav-icon></j-app-bar-nav-icon>
+      <j-app-bar-title>JACKIE UI</j-app-bar-title>
+    </j-app-bar>
+  </j-app>
 </template>

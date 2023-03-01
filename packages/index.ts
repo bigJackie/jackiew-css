@@ -1,13 +1,13 @@
 import type { ModuleNode, PluginOption, ViteDevServer } from "vite";
-import { customize, generateStyle, groupHandler } from "./core";
+import { customize, generateStyle, groupHandler, getStyle } from "./core";
 import { StylePreset } from "./utils/type";
 
-export default function loadClass(presets: StylePreset = null) {
+export function AtomCss(presets: StylePreset = null) {
   if (presets) customize(presets);
 
   const vueRE: RegExp = /\.vue$/,
     cssRE: RegExp = /\.css$/,
-    classRE: RegExp = /(?<=class=")(.*)(?=")/g,
+    classRE: RegExp = /(?<=class=")(.*?)(?=")/g,
     styleRE: RegExp = /<(style)[\s\S]*?>[\s\S]+?<\/\1>/g;
   let viteServer: ViteDevServer = null,
     cssModules: ModuleNode[] = null;
@@ -24,10 +24,11 @@ export default function loadClass(presets: StylePreset = null) {
       if (vueRE.test(file)) {
         cssModules = modules.filter(module => cssRE.test(module.url));
         updateModules = modules.filter(module => vueRE.test(module.url));
+        return [...updateModules];
       } else {
         cssModules = null;
+        return [...modules];
       }
-      return [...updateModules];
     },
 
     transform(code, id, opt) {
@@ -74,3 +75,6 @@ export default function loadClass(presets: StylePreset = null) {
     },
   };
 }
+
+export * from "./utils/type";
+export { getStyle };
