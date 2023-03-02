@@ -1,11 +1,27 @@
 {
   "name": "@jackiew/atomcss",
-  "private": true,
+  "private": false,
   "version": "0.0.0",
   "type": "module",
   "author": "JackieWong",
   "license": "MIT",
-  "main": "jackiew-css.es.js",
+  "main": "dist/jackiew-css.umd.cjs",
+  "module": "dist/jackiew-css.es.js",
+  "style": "dist/style.css",
+  "exports": {
+    ".": {
+      "import": "./dist/jackiew-css.es.js",
+      "require": "./dist/jackiew-css.umd.cjs"
+    },
+    "./*": "./*"
+  },
+  "keywords": [
+    "vue3",
+    "vite",
+    "component",
+    "ui",
+    "typescript"
+  ],
   "scripts": {
     "dev": "npm -r --parallel --filter=./packages/* run dev",
     "build": "vite build && copy package.json dist",
