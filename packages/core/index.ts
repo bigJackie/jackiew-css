@@ -13,15 +13,14 @@ export function generateStyle(classLine: string) {
   const classItems: string[] = classLine.split(" ");
   let style: string = "";
 
-  for (let ruleIndex = rules.length - 1; ruleIndex >= 0; ruleIndex--) {
-    const rule: Rule = rules[ruleIndex];
-
-    for (let classItem of classItems) {
-      const className = classItem;
-      let ruleName: string = className,
-        ruleSelectors: Selector[] = [],
-        ruleRewrites: ReWrite[] = [],
-        ruleWrapper: Wrapper = null;
+  for (let classItem of classItems) {
+    const className = classItem;
+    let ruleName: string = className,
+      ruleSelectors: Selector[] = [],
+      ruleRewrites: ReWrite[] = [],
+      ruleWrapper: Wrapper = null;
+    for (let ruleIndex = rules.length - 1; ruleIndex >= 0; ruleIndex--) {
+      const rule: Rule = rules[ruleIndex];
 
       for (let variantIndex = 0; variantIndex < variants.length; variantIndex++) {
         const variant: Variant = variants[variantIndex];
@@ -43,6 +42,7 @@ export function generateStyle(classLine: string) {
         style += merge;
         classMap.set(className, merge);
       }
+      break;
     }
   }
   return style;
@@ -54,16 +54,15 @@ export function getStyle(classLine: string) {
 
   const classItems: string[] = classLine.split(" ");
   let style: string = "";
+  for (let classItem of classItems) {
+    const className = classItem;
+    let ruleName: string = className,
+      ruleSelectors: Selector[] = [],
+      ruleRewrites: ReWrite[] = [],
+      ruleWrapper: Wrapper = null;
 
-  for (let ruleIndex = rules.length - 1; ruleIndex >= 0; ruleIndex--) {
-    const rule: Rule = rules[ruleIndex];
-
-    for (let classItem of classItems) {
-      const className = classItem;
-      let ruleName: string = className,
-        ruleSelectors: Selector[] = [],
-        ruleRewrites: ReWrite[] = [],
-        ruleWrapper: Wrapper = null;
+    for (let ruleIndex = rules.length - 1; ruleIndex >= 0; ruleIndex--) {
+      const rule: Rule = rules[ruleIndex];
 
       for (let variantIndex = 0; variantIndex < variants.length; variantIndex++) {
         const variant: Variant = variants[variantIndex];
@@ -79,6 +78,7 @@ export function getStyle(classLine: string) {
       const attrs = typeof rule[1] === "function" ? rule[1]((<RegExp>rule[0]).exec(ruleName)) : rule[1];
       const merge = mergeStyle(className, attrs, ruleSelectors, ruleRewrites, ruleWrapper);
       style += merge;
+      break;
     }
   }
   return style;

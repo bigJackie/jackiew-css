@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getStyle } from "../packages/core";
 
-describe.concurrent("font style", () => {
+describe.concurrent("spacing", () => {
   /* margin */
   it("margin-top", () => {
     const style = "mt-20";

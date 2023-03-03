@@ -31,7 +31,7 @@ describe.concurrent("font style", () => {
   it("text-color", () => {
     const style = "text-red text-current text-rose-200";
     expect(getStyle(style)).toEqual(
-      ".text-red{color:#ef4444;}.text-rose-200{color:#fecdd3;}.text-current{color:currentColor;}"
+      ".text-red{color:#ef4444;}.text-current{color:currentColor;}.text-rose-200{color:#fecdd3;}"
     );
   });
 

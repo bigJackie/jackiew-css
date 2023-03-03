@@ -10,14 +10,14 @@ describe.concurrent("features", () => {
   it("hover", () => {
     const style = "hover:text-0 !hover:t-height-20";
     expect(getStyle(style)).toEqual(
-      ".\\!hover\\:t-height-20:hover{line-height:20px !important;}.hover\\:text-0:hover{font-size:0px;}"
+      ".hover\\:text-0:hover{font-size:0px;}.\\!hover\\:t-height-20:hover{line-height:20px !important;}"
     );
   });
 
   it("group", () => {
     const style = " hover:(text-80 t-spacing-30) !focus:(text-80 t-spacing-30)";
     expect(getStyle(style)).toEqual(
-      ".hover\\:t-spacing-30:hover{letter-spacing:30px;}.\\!focus\\:t-spacing-30:focus{letter-spacing:30px !important;}.hover\\:text-80:hover{font-size:80px;}.\\!focus\\:text-80:focus{font-size:80px !important;}"
+      ".hover\\:text-80:hover{font-size:80px;}.hover\\:t-spacing-30:hover{letter-spacing:30px;}.\\!focus\\:text-80:focus{font-size:80px !important;}.\\!focus\\:t-spacing-30:focus{letter-spacing:30px !important;}"
     );
   });
 
