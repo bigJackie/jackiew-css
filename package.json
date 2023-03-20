@@ -1,17 +1,16 @@
 {
   "name": "@jackiew/atomcss",
   "private": false,
-  "version": "0.0.0",
+  "version": "0.0.1-alpha.04",
   "type": "module",
   "author": "JackieWong",
   "license": "MIT",
-  "main": "dist/jackiew-css.umd.cjs",
-  "module": "dist/jackiew-css.es.js",
+  "main": "dist/index.cjs",
   "style": "dist/style.css",
   "exports": {
     ".": {
-      "import": "./dist/jackiew-css.es.js",
-      "require": "./dist/jackiew-css.umd.cjs"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./*": "./*"
   },
@@ -25,6 +24,7 @@
   "scripts": {
     "dev": "npm -r --parallel --filter=./packages/* run dev",
     "build": "vite build && copy package.json dist",
+    "build:ts": "tsup && copy package.json dist",
     "preview": "vite preview",
     "test": "vitest",
     "coverage": "vitest run --coverage",
@@ -41,6 +41,7 @@
     "conventional-changelog-cli": "^2.2.2",
     "husky": "^8.0.3",
     "right-pad": "^1.0.1",
+    "tsup": "^6.7.0",
     "typescript": "^4.9.3",
     "vite": "^4.1.0",
     "vitest": "^0.28.5",

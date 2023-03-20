@@ -1,6 +1,8 @@
 import type { ModuleNode, PluginOption, ViteDevServer } from "vite";
 import { customize, generateStyle, groupHandler, getStyle } from "./core";
 import { StylePreset } from "./utils/type";
+import { resolve } from "path";
+import fs from "fs";
 
 export function AtomCss(presets: StylePreset = null) {
   if (presets) customize(presets);
@@ -9,69 +11,84 @@ export function AtomCss(presets: StylePreset = null) {
     cssRE: RegExp = /\.css$/,
     classRE: RegExp = /(?<=class=")(.*?)(?=")/g,
     styleRE: RegExp = /<(style)[\s\S]*?>[\s\S]+?<\/\1>/g;
-  let viteServer: ViteDevServer = null,
-    cssModules: ModuleNode[] = null;
+  // let viteServer: ViteDevServer = null,
+  //   cssModules: ModuleNode[] = null;
+
+  fs.open(resolve(__dirname, "../") + "\\atom.css", "w", function (err, fd) {
+    if (err) return console.error(err);
+    fs.close(fd, function (err) {
+      if (err) return console.error(err);
+    });
+  });
 
   return <PluginOption>{
     name: "class-loader",
     enforce: "pre",
 
-    handleHotUpdate(ctx) {
-      let updateModules: ModuleNode[];
-      const { file, server, modules } = ctx;
-      if (!viteServer) viteServer = server;
+    // handleHotUpdate(ctx) {
+    //   let updateModules: ModuleNode[];
+    //   const { file, server, modules } = ctx;
+    //   if (!viteServer) viteServer = server;
 
-      if (vueRE.test(file)) {
-        cssModules = modules.filter(module => cssRE.test(module.url));
-        updateModules = modules.filter(module => vueRE.test(module.url));
-        return [...updateModules];
-      } else {
-        cssModules = null;
-        return [...modules];
-      }
-    },
+    //   if (vueRE.test(file)) {
+    //     cssModules = modules.filter(module => cssRE.test(module.url));
+    //     updateModules = modules.filter(module => vueRE.test(module.url));
+    //     return [...updateModules];
+    //   } else {
+    //     cssModules = null;
+    //     return [...modules];
+    //   }
+    // },
 
     transform(code, id, opt) {
       // Match .vue files
       if (!vueRE.test(id)) return code;
 
-      let cssFileNum: number = 0,
-        style: string = "";
-
-      // Match inline class
       if (classRE.test(code)) {
-        cssFileNum++;
         let class_inline = code.match(classRE);
         for (let line of class_inline) {
           const newLine = groupHandler(line);
-          code = code.replace(line, newLine);
-          style += generateStyle(newLine);
+          fs.appendFile(resolve(__dirname, "../") + "\\atom.css", generateStyle(newLine), err => {});
         }
       }
-      if (styleRE.test(code)) cssFileNum += code.match(styleRE).length;
 
-      if (!cssModules) return `<style>${style}</style>${code}`;
+      // let cssFileNum: number = 0,
+      //   style: string = "";
+
+      // Match inline class
+      // if (classRE.test(code)) {
+      //   cssFileNum++;
+      //   let class_inline = code.match(classRE);
+      //   for (let line of class_inline) {
+      //     const newLine = groupHandler(line);
+      //     code = code.replace(line, newLine);
+      //     style += generateStyle(newLine);
+      //   }
+      // }
+      // if (styleRE.test(code)) cssFileNum += code.match(styleRE).length;
+
+      // if (!cssModules) return `<style>${style}</style>${code}`;
 
       // check if changed .vue file's inline class, update virtual css file
-      for (let index = 0; index < cssModules.length; index++) {
-        if (cssFileNum <= 0) continue;
+      // for (let index = 0; index < cssModules.length; index++) {
+      //   if (cssFileNum <= 0) continue;
 
-        const module = cssModules[index];
-        viteServer.ws.send({
-          type: "update",
-          updates: [
-            {
-              type: "js-update",
-              path: module.url,
-              acceptedPath: module.url,
-              timestamp: new Date().getTime(),
-            },
-          ],
-        });
-        cssFileNum--;
-      }
+      //   const module = cssModules[index];
+      //   viteServer.ws.send({
+      //     type: "update",
+      //     updates: [
+      //       {
+      //         type: "js-update",
+      //         path: module.url,
+      //         acceptedPath: module.url,
+      //         timestamp: new Date().getTime(),
+      //       },
+      //     ],
+      //   });
+      //   cssFileNum--;
+      // }
 
-      return `<style>${style}</style>${code}`;
+      // return `<style>${style}</style>${code}`;
     },
   };
 }

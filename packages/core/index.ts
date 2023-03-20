@@ -1,6 +1,5 @@
 import { rules, variants } from "../presets/default/_rule";
 import { RuleHandler, Selector, ReWrite, Wrapper, StylePreset, Rule, Variant } from "../utils/type";
-
 const classMap: Map<string, string> = new Map();
 
 /* customize preset */
@@ -35,7 +34,7 @@ export function generateStyle(classLine: string) {
       if (!(<RegExp>rule[0]).test(ruleName)) continue;
 
       if (hasClass(className)) {
-        style += classMap.get(className);
+        // style += classMap.get(className);
       } else {
         const attrs = typeof rule[1] === "function" ? rule[1]((<RegExp>rule[0]).exec(ruleName)) : rule[1];
         const merge = mergeStyle(className, attrs, ruleSelectors, ruleRewrites, ruleWrapper);
